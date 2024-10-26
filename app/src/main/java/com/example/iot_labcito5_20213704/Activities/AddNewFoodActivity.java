@@ -83,6 +83,10 @@ public class AddNewFoodActivity extends AppCompatActivity {
                 Toast.makeText(this, "Por favor, complete todos los campos correctamente", Toast.LENGTH_SHORT).show();
             }
         });
+
+
+
+
     }
 
 
@@ -120,6 +124,7 @@ public class AddNewFoodActivity extends AppCompatActivity {
         intent.putExtra("calorias" ,calorias );
         startActivity(intent);
     }
+
 
 
 }

@@ -30,7 +30,7 @@ public class ComidaAdapter extends RecyclerView.Adapter<ComidaAdapter.ComidaView
     public void onBindViewHolder(@NonNull ComidaViewHolder holder, int position) {
         Comida comida = listaComidas.get(position);
         holder.tvNombreComida.setText(comida.getNombre());
-        holder.tvCalorias.setText(String.valueOf(comida.getCalorias()));
+        holder.tvCalorias.setText(String.valueOf(comida.getCalorias()) + "calorías");
     }
 
     @Override
