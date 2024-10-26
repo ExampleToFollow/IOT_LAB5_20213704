@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="actividad_fisica">
-        <item>Sedentario</item>
-        <item>Ligero</item>
-        <item>Moderado</item>
-        <item>Activo</item>
-        <item>Muy Activo</item>
+        <item value="Ningún ejercicio">Ningún ejercicio</item>
+        <item value="Ligero" >Ligero</item>
+        <item value="Moderado">Moderado</item>
+        <item value="Fuerte">Fuerte</item>
+        <item value="Muy Fuerte">Muy Fuerte</item>
     </string-array>
 </resources>
