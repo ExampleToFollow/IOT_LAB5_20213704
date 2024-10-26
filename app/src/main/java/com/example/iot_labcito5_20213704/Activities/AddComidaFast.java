@@ -49,7 +49,6 @@ public class AddComidaFast extends AppCompatActivity {
         tvCalorias = findViewById(R.id.tvCalorias);
         btnGuardar = findViewById(R.id.btnGuardar);
 
-        // Inicializar el HashMap con 5 alimentos comunes y sus calorías
         alimentosCalorias = new HashMap<>();
         alimentosCalorias.put("Manzana", 52);
         alimentosCalorias.put("Banana", 89);
@@ -57,7 +56,6 @@ public class AddComidaFast extends AppCompatActivity {
         alimentosCalorias.put("Leche (1 taza)", 42);
         alimentosCalorias.put("Arroz Cocido (1 taza)", 130);
 
-        // Crear una lista de nombres de alimentos
         ArrayList<String> listaAlimentos = new ArrayList<>(alimentosCalorias.keySet());
 
         // Configurar el adaptador para el Spinner

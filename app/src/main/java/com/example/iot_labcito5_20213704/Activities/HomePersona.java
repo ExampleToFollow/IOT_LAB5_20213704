@@ -134,4 +134,10 @@ public class HomePersona extends AppCompatActivity {
             notificationManager.notify(1, builder.build());
         }
     }
+    public void addComidaFast (View view){
+        Intent intent =  new Intent(this , AddComidaFast.class);
+        intent.putExtra("persona", personita);
+        intent.putExtra("calorias" ,calorias );
+        startActivity(intent);
+    }
 }
