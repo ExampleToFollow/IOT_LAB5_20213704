@@ -1,5 +1,6 @@
 package com.example.iot_labcito5_20213704.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -32,6 +33,7 @@ public class AddNewFoodActivity extends AppCompatActivity {
     private MaterialButton btnGuardar;
 
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,23 +46,18 @@ public class AddNewFoodActivity extends AppCompatActivity {
         });
         personita = (Persona) getIntent().getSerializableExtra("persona");
         calorias = (Double) getIntent().getSerializableExtra("calorias");
-
-
-        // Obtén referencias a los elementos de la interfaz
-        inputLayoutNombreComida = findViewById(R.id.etNombreComida);
-        inputLayoutCalorias = findViewById(R.id.etCaloriasComida);
-        etNombreComida = findViewById(R.id.etNombreComida);
-        etCaloriasComida = findViewById(R.id.etCaloriasComida);
-        btnGuardar = findViewById(R.id.btnGuardar);
-
-        // Configura el listener para el botón
+        inputLayoutNombreComida = (TextInputLayout) findViewById(R.id.etNombreComidaLayout);
+        inputLayoutCalorias = (TextInputLayout) findViewById(R.id.etCaloriasComidaLayout);
+        etNombreComida = (TextInputEditText)findViewById(R.id.etNombreComida);
+        etCaloriasComida = (TextInputEditText) findViewById(R.id.etCaloriasComida);
+        btnGuardar = (MaterialButton)findViewById(R.id.btnGuardar);
         btnGuardar.setOnClickListener(v -> {
             if (validarCampos()) {
                 Toast.makeText(this, "Datos guardados exitosamente", Toast.LENGTH_SHORT).show();
                 String nombreComida = etNombreComida.getText().toString().trim();
                 String caloriasStr = etCaloriasComida.getText().toString().trim();
                 Instant instante = Instant.now();
-                if(personita.getComidas().isEmpty()){
+                if(personita.getComidas() == null){
                     Comida comida = new Comida();
                     comida.setNombre(nombreComida);
                     comida.setCalorias(Double.parseDouble(caloriasStr));
@@ -118,7 +115,10 @@ public class AddNewFoodActivity extends AppCompatActivity {
     }
 
     public void volver(View view) {
-        onBackPressed();
+        Intent intent = new Intent(this, HomePersona.class);
+        intent.putExtra("persona", personita);
+        intent.putExtra("calorias" ,calorias );
+        startActivity(intent);
     }
 
 

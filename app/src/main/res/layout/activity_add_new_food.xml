@@ -48,6 +48,7 @@
 
             <!-- Campo de entrada para el nombre de la comida -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/etNombreComidaLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Nombre de la comida"
@@ -65,6 +66,7 @@
             <!-- Campo de entrada para las calorías de la comida -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
+                android:id="@+id/etCaloriasComidaLayout"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="Calorías"
