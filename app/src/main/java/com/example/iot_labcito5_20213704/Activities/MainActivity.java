@@ -1,5 +1,6 @@
-package com.example.iot_labcito5_20213704;
+package com.example.iot_labcito5_20213704.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -9,12 +10,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 
-import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
-import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.iot_labcito5_20213704.Beans.Persona;
+import com.example.iot_labcito5_20213704.R;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
+
 public class MainActivity extends AppCompatActivity {
     private TextInputEditText etPeso, etAltura, etEdad;
     private RadioGroup rgGenero, rgObjetivo;
@@ -88,10 +90,16 @@ public class MainActivity extends AppCompatActivity {
 
         if(rgObjetivoStr.equals(rbSubirPesoStr)){objetivo = "subir";};
         if(rgObjetivoStr.equals(rbBajarPesoStr)){objetivo = "bajar";};
-        if(rgObjetivoStr.equals(rbMantenerPesoStr)){objetivo = "mantener";};
-
-
-        double tmb;
+        if(rgObjetivoStr.equals(rbMantenerPesoStr)){objetivo = "mantener";}
+        String actividadStr = spinnerActividad.getSelectedItem().toString();
+        Persona persona =  new Persona();
+        persona.setActividad(actividadStr);
+        persona.setAltura(altura);
+        persona.setEdad(edad);
+        persona.setGenero(genero);
+        persona.setPeso(peso);
+        persona.setObjetivo(objetivo);
+        Double tmb;
         if (genero.equals("masculino")) {
             tmb = 10*peso + 6.25*altura - 5*edad + 5;
         } else {
@@ -109,6 +117,10 @@ public class MainActivity extends AppCompatActivity {
             tmb = tmb - 300;
         }
         Toast.makeText(this, "Calorías recomendadas: " + tmb, Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(MainActivity.this, HomePersona.class);
+        intent.putExtra("persona", persona);
+        intent.putExtra("calorias" ,tmb );
+        startActivity(intent);
     }
 
 
