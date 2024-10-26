@@ -13,6 +13,7 @@ public class Persona implements Serializable {
     private String actividad;
     private String objetivo;
     private ArrayList<Comida> comidas;
+    private ArrayList<ActividadFisica> actividadesFisicas;
 
     public Double getPeso() {
         return peso;
@@ -68,5 +69,13 @@ public class Persona implements Serializable {
 
     public void setComidas(ArrayList<Comida> comidas) {
         this.comidas = comidas;
+    }
+
+    public ArrayList<ActividadFisica> getActividadesFisicas() {
+        return actividadesFisicas;
+    }
+
+    public void setActividadesFisicas(ArrayList<ActividadFisica> actividadesFisicas) {
+        this.actividadesFisicas = actividadesFisicas;
     }
 }

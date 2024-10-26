@@ -59,6 +59,20 @@
                 android:layout_marginTop="16dp"/>
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/metaDiaria"
+            android:text="Hola Mundo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ></TextView>
+
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="actividad"
+            android:text="Reducir calorías usando actividad física"
+            android:layout_marginTop="16dp"/>
+
 
 
     </LinearLayout>
