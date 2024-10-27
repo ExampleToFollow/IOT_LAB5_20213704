@@ -2,13 +2,18 @@ package com.example.iot_labcito5_20213704.Activities;
 
 import static android.Manifest.permission.POST_NOTIFICATIONS;
 
+import static java.util.Calendar.*;
+
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import java.util.ArrayList;
+import java.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -20,16 +25,22 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.work.Data;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import com.example.iot_labcito5_20213704.Beans.ActividadFisica;
 import com.example.iot_labcito5_20213704.Beans.Comida;
 import com.example.iot_labcito5_20213704.Beans.Persona;
 import com.example.iot_labcito5_20213704.R;
+import com.example.iot_labcito5_20213704.WorkerManagerNotification;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.concurrent.TimeUnit;
 
 public class HomePersona extends AppCompatActivity {
     Persona personita ;
@@ -49,6 +60,7 @@ public class HomePersona extends AppCompatActivity {
         personita = (Persona) getIntent().getSerializableExtra("persona");
         calorias = (Double) getIntent().getSerializableExtra("calorias");
         verificarNotificacion();
+        notificarIngresoComida();
     }
 
     public void mostrarComidas(View view) {
@@ -75,8 +87,6 @@ public class HomePersona extends AppCompatActivity {
         intent.putExtra("calorias" ,calorias );
         startActivity(intent);
     }
-
-
     //PARA LAS NOTIFICACIONES
     public void crearCanalNotificacion(){
 
@@ -149,5 +159,37 @@ public class HomePersona extends AppCompatActivity {
             ola.setText("Te faltan " + (calorias -caloriasConsumidas) + " calorías para alcanzar el objetivo");
         }
     }
-
+    public void notificarIngresoComida(){
+        Data dataBreakFast = new Data.Builder().putString("food","breakfast").build();
+        Data dataLunch = new Data.Builder().putString("food","lunch").build();
+        Data dataDinner = new Data.Builder().putString("food","dinner").build();
+        Calendar  breakFast =  Calendar.getInstance();
+        breakFast.set(Calendar.HOUR_OF_DAY, 7);
+        breakFast.set(Calendar.MINUTE,30);
+        breakFast.set(Calendar.SECOND, 0);
+        Calendar lunch =  Calendar.getInstance();
+        lunch.set(Calendar.HOUR_OF_DAY, 13);
+        lunch.set(Calendar.MINUTE, 0);
+        lunch.set(Calendar.SECOND, 0);
+        Calendar dinner =  Calendar.getInstance();
+        dinner.set(Calendar.HOUR_OF_DAY, 20);
+        dinner.set(Calendar.MINUTE, 30);
+        dinner.set(Calendar.SECOND, 0);
+        ArrayList<Calendar> fechas = new ArrayList<Calendar>();
+        fechas.add(breakFast);
+        fechas.add(lunch);
+        fechas.add(dinner);
+        ArrayList<Data> datosComidas = new ArrayList<Data>();
+        datosComidas.add(dataBreakFast);
+        datosComidas.add(dataLunch);
+        datosComidas.add(dataDinner);
+        for (int i = 0; i < fechas.size(); i++) {
+            long time = fechas.get(i).getTimeInMillis();
+            if(time<=System.currentTimeMillis()){
+                time = time + TimeUnit.DAYS.toMillis(1);
+            }
+            PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(WorkerManagerNotification.class,1, TimeUnit.DAYS).setInitialDelay(time- System.currentTimeMillis(), TimeUnit.MILLISECONDS).setInputData(datosComidas.get(i)).build();
+            WorkManager.getInstance(this).enqueueUniquePeriodicWork(datosComidas.get(i).getString("food"), ExistingPeriodicWorkPolicy.REPLACE,workRequest);
+        }
+    }
 }
