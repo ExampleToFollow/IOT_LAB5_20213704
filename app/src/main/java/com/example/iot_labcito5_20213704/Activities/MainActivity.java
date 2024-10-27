@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return esValido;
     }
-
     private void calcularCalorias() {
         double peso = Double.parseDouble(etPeso.getText().toString());
         double altura = Double.parseDouble(etAltura.getText().toString());
@@ -122,10 +121,4 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("calorias" ,tmb );
         startActivity(intent);
     }
-
-
-
-
-
-
 }

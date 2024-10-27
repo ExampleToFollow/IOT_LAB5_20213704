@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -22,6 +23,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.iot_labcito5_20213704.Beans.ActividadFisica;
 import com.example.iot_labcito5_20213704.Beans.Comida;
 import com.example.iot_labcito5_20213704.Beans.Persona;
 import com.example.iot_labcito5_20213704.R;
@@ -30,6 +32,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,8 +56,10 @@ public class AddNewFoodActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        //----------------
         personita = (Persona) getIntent().getSerializableExtra("persona");
         calorias = (Double) getIntent().getSerializableExtra("calorias");
+        //----------------
         inputLayoutNombreComida = (TextInputLayout) findViewById(R.id.etNombreComidaLayout);
         inputLayoutCalorias = (TextInputLayout) findViewById(R.id.etCaloriasComidaLayout);
         etNombreComida = (TextInputEditText)findViewById(R.id.etNombreComida);
@@ -82,7 +89,7 @@ public class AddNewFoodActivity extends AppCompatActivity {
                     personita.setComidas(listaComida);
                 }
                 Toast.makeText(this, "Guardado con exito", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, ListaComidasActivity.class);
+                Intent intent = new Intent(this, HomePersona.class);
                 intent.putExtra("persona", personita);
                 intent.putExtra("calorias" ,calorias );
                 startActivity(intent);
@@ -90,19 +97,7 @@ public class AddNewFoodActivity extends AppCompatActivity {
                 Toast.makeText(this, "Por favor, complete todos los campos correctamente", Toast.LENGTH_SHORT).show();
             }
         });
-
-        Double caloriasConsumidas = new Double(0.0);
-        if (personita.getComidas()!=null){
-            for(Comida comida : personita.getComidas()){
-                caloriasConsumidas = caloriasConsumidas + comida.getCalorias();
-            }
-        }
-
-
-        crearCanalNotificacion();
-        if(caloriasConsumidas>calorias){
-            lanzarNotificacion("Limite rebasado" , "Ya consumiste más caloría de las que debías , deberías de realizar más actividad física o consumir comida con menos calorías");
-        }
+        verificarNotificacion();
     }
     private boolean validarCampos() {
         String nombreComida = etNombreComida.getText().toString().trim();
@@ -137,6 +132,7 @@ public class AddNewFoodActivity extends AppCompatActivity {
         intent.putExtra("calorias" ,calorias );
         startActivity(intent);
     }
+    //PARA LAS NOTIFICACIONES
     public void crearCanalNotificacion(){
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -173,4 +169,29 @@ public class AddNewFoodActivity extends AppCompatActivity {
             notificationManager.notify(1, builder.build());
         }
     }
+    public void verificarNotificacion(){
+        Double caloriasConsumidas = new Double(0.0);
+        LocalDateTime medianocheManana = LocalDate.now().plusDays(1).atStartOfDay(); // Mañana a las 00:00
+        if (personita.getComidas()!=null){
+            for(Comida comida : personita.getComidas()){
+                if(comida.getFecha().isBefore(medianocheManana.atZone(ZoneId.systemDefault()).toInstant())){
+                    caloriasConsumidas = caloriasConsumidas + comida.getCalorias();
+                }
+            }
+        }
+        if(personita.getActividadesFisicas() != null){
+            for(ActividadFisica a : personita.getActividadesFisicas()){
+                if(a.getFecha().isBefore(medianocheManana.atZone(ZoneId.systemDefault()).toInstant())){
+                    caloriasConsumidas = caloriasConsumidas - a.getCalorias();
+                }
+            }
+        }
+
+       crearCanalNotificacion();
+        if(caloriasConsumidas>calorias){
+            lanzarNotificacion("Limite rebasado" , "Ya consumiste más caloría de las que debías , deberías de realizar más actividad física o consumir comida con menos calorías");
+        }
+
+    }
+
 }

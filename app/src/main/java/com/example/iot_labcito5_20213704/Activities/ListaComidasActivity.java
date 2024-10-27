@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,10 +23,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.iot_labcito5_20213704.Adapters.ComidaAdapter;
+import com.example.iot_labcito5_20213704.Beans.ActividadFisica;
 import com.example.iot_labcito5_20213704.Beans.Comida;
 import com.example.iot_labcito5_20213704.Beans.Persona;
 import com.example.iot_labcito5_20213704.R;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,8 +51,10 @@ public class ListaComidasActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        //Recogemos datos de siempre
         personita = (Persona) getIntent().getSerializableExtra("persona");
         calorias = (Double) getIntent().getSerializableExtra("calorias");
+        //----------------------------------------------
         if(personita.getComidas()!=null){
             recyclerView = findViewById(R.id.irvComidas);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -55,16 +62,8 @@ public class ListaComidasActivity extends AppCompatActivity {
             adapter = new ComidaAdapter(listaComidas);
             recyclerView.setAdapter(adapter);
         }
-        Double caloriasConsumidas = new Double(0.0);
-        if (personita.getComidas()!=null){
-            for(Comida comida : personita.getComidas()){
-                caloriasConsumidas = caloriasConsumidas + comida.getCalorias();
-            }
-        }
-        crearCanalNotificacion();
-        if(caloriasConsumidas>calorias){
-            lanzarNotificacion("Limite rebasado" , "Ya consumiste más caloría de las que debías , deberías de realizar más actividad física o consumir comida con menos calorías");
-        }
+        //EJECUTAMOS METODO DE NOTIFICACIÓN
+        verificarNotificacion();
     }
     public void volver(View view){
         Intent intent = new Intent(this,HomePersona.class);
@@ -72,6 +71,7 @@ public class ListaComidasActivity extends AppCompatActivity {
         intent.putExtra("calorias" ,calorias );
         startActivity(intent);
     }
+    //PARA LAS NOTIFICACIONES
     public void crearCanalNotificacion(){
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -106,6 +106,28 @@ public class ListaComidasActivity extends AppCompatActivity {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         if (ActivityCompat.checkSelfPermission(this, POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             notificationManager.notify(1, builder.build());
+        }
+    }
+    public void verificarNotificacion(){
+        Double caloriasConsumidas = new Double(0.0);
+        LocalDateTime medianocheManana = LocalDate.now().plusDays(1).atStartOfDay(); // Mañana a las 00:00
+        if (personita.getComidas()!=null){
+            for(Comida comida : personita.getComidas()){
+                if(comida.getFecha().isBefore(medianocheManana.atZone(ZoneId.systemDefault()).toInstant())){
+                    caloriasConsumidas = caloriasConsumidas + comida.getCalorias();
+                }
+            }
+        }
+        if(personita.getActividadesFisicas() != null){
+            for(ActividadFisica a : personita.getActividadesFisicas()){
+                if(a.getFecha().isBefore(medianocheManana.atZone(ZoneId.systemDefault()).toInstant())){
+                    caloriasConsumidas = caloriasConsumidas - a.getCalorias();
+                }
+            }
+        }
+         crearCanalNotificacion();
+        if(caloriasConsumidas>calorias){
+            lanzarNotificacion("Limite rebasado" , "Ya consumiste más caloría de las que debías , deberías de realizar más actividad física o consumir comida con menos calorías");
         }
     }
 }

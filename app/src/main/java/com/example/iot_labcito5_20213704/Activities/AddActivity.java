@@ -42,8 +42,10 @@ public class AddActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        //RECOGEMOS DATOS DE SIEMPRE
         personita = (Persona) getIntent().getSerializableExtra("persona");
         calorias = (Double) getIntent().getSerializableExtra("calorias");
+        //-----------------------------------
         inputLayoutNombreComida = (TextInputLayout) findViewById(R.id.etNombreComidaLayout);
         inputLayoutCalorias = (TextInputLayout) findViewById(R.id.etCaloriasComidaLayout);
         etNombreComida = (TextInputEditText) findViewById(R.id.etNombreComida);
@@ -73,8 +75,7 @@ public class AddActivity extends AppCompatActivity {
                     personita.setActividadesFisicas(listaComida);
                 }
                 Toast.makeText(this, "Guardado con exito", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, ListaComidasActivity.class);
-                calorias = calorias - Double.parseDouble(caloriasStr);
+                Intent intent = new Intent(this, HomePersona.class);
                 intent.putExtra("persona", personita);
                 intent.putExtra("calorias", calorias);
                 startActivity(intent);
@@ -82,9 +83,8 @@ public class AddActivity extends AppCompatActivity {
                 Toast.makeText(this, "Por favor, complete todos los campos correctamente", Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
+
     private boolean validarCampos() {
         String nombreComida = etNombreComida.getText().toString().trim();
         if (TextUtils.isEmpty(nombreComida)) {
@@ -117,5 +117,4 @@ public class AddActivity extends AppCompatActivity {
         intent.putExtra("persona", personita);
         intent.putExtra("calorias" ,calorias );
         startActivity(intent);    }
-
 }

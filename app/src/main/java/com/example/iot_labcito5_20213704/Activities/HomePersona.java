@@ -35,7 +35,6 @@ public class HomePersona extends AppCompatActivity {
     Persona personita ;
     Double calorias;
     String channelId = "oli";
-
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,37 +48,9 @@ public class HomePersona extends AppCompatActivity {
         });
         personita = (Persona) getIntent().getSerializableExtra("persona");
         calorias = (Double) getIntent().getSerializableExtra("calorias");
-        Double caloriasConsumidas = new Double(0.0);
-        LocalDateTime medianocheManana = LocalDate.now().plusDays(1).atStartOfDay(); // Mañana a las 00:00
-        if (personita.getComidas()!=null){
-            for(Comida comida : personita.getComidas()){
-                if(comida.getFecha().isBefore(medianocheManana.atZone(ZoneId.systemDefault()).toInstant())){
-                    caloriasConsumidas = caloriasConsumidas + comida.getCalorias();
-                }
-            }
-        }
-         if(personita.getActividadesFisicas() != null){
-             for(ActividadFisica a : personita.getActividadesFisicas()){
-                 if(a.getFecha().isBefore(medianocheManana.atZone(ZoneId.systemDefault()).toInstant())){
-                     caloriasConsumidas = caloriasConsumidas - a.getCalorias();
-                 }
-             }
-         }
-        ( (TextView) findViewById(R.id.ola)).setText("Para lograr el objetivo de " + personita.getObjetivo() + " necesitas " + calorias + " calorías");
-        ( (TextView) findViewById(R.id.ola2)).setText("Total Consumido de Calorías (considerando actividad física), hoy: " + caloriasConsumidas );
-        crearCanalNotificacion();
-        if(caloriasConsumidas>calorias){
-            lanzarNotificacion("Limite rebasado" , "Ya consumiste más caloría de las que debías , deberías de realizar más actividad física o consumir comida con menos calorías");
-        }
-        TextView ola  = findViewById(R.id.metaDiaria);
-        if(caloriasConsumidas>calorias){
-            //EXCESO
-            ola.setText("Te excediste en " + (caloriasConsumidas-calorias) + " calorías");
-        }else{
-            //NO EXCESO
-            ola.setText("Te faltan " + (calorias -caloriasConsumidas) + " calorías para alcanzar el objetivo");
-        }
+        verificarNotificacion();
     }
+
     public void mostrarComidas(View view) {
         Intent intent =  new Intent(this , ListaComidasActivity.class);
         intent.putExtra("persona", personita);
@@ -98,6 +69,15 @@ public class HomePersona extends AppCompatActivity {
         intent.putExtra("calorias" ,calorias );
         startActivity(intent);
     }
+    public void addComidaFast (View view){
+        Intent intent =  new Intent(this , AddComidaFast.class);
+        intent.putExtra("persona", personita);
+        intent.putExtra("calorias" ,calorias );
+        startActivity(intent);
+    }
+
+
+    //PARA LAS NOTIFICACIONES
     public void crearCanalNotificacion(){
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -134,10 +114,40 @@ public class HomePersona extends AppCompatActivity {
             notificationManager.notify(1, builder.build());
         }
     }
-    public void addComidaFast (View view){
-        Intent intent =  new Intent(this , AddComidaFast.class);
-        intent.putExtra("persona", personita);
-        intent.putExtra("calorias" ,calorias );
-        startActivity(intent);
+    public void verificarNotificacion(){
+        Double caloriasConsumidas = new Double(0.0);
+        LocalDateTime medianocheManana = LocalDate.now().plusDays(1).atStartOfDay(); // Mañana a las 00:00
+        LocalDateTime medianocheMananaAyer = LocalDate.now().atStartOfDay(); // Mañana a las 00:00
+
+        if (personita.getComidas()!=null){
+            for(Comida comida : personita.getComidas()){
+                if(comida.getFecha().isBefore(medianocheManana.atZone(ZoneId.systemDefault()).toInstant())
+                        && comida.getFecha().isAfter(medianocheMananaAyer.atZone(ZoneId.systemDefault()).toInstant())
+                ){
+                    caloriasConsumidas = caloriasConsumidas + comida.getCalorias();
+                }
+            }
+        }
+        if(personita.getActividadesFisicas() != null){
+            for(ActividadFisica a : personita.getActividadesFisicas()){
+                if(a.getFecha().isBefore(medianocheManana.atZone(ZoneId.systemDefault()).toInstant())
+                 && a.getFecha().isAfter(medianocheMananaAyer.atZone(ZoneId.systemDefault()).toInstant())
+                ){
+                    caloriasConsumidas = caloriasConsumidas - a.getCalorias();
+                }
+            }
+        }
+        ( (TextView) findViewById(R.id.ola)).setText("Para lograr el objetivo de " + personita.getObjetivo() + " necesitas " + calorias + " calorías");
+        ( (TextView) findViewById(R.id.ola2)).setText("Calorias del día (considerando actividad física), hoy: " + caloriasConsumidas );
+        crearCanalNotificacion();
+        if(caloriasConsumidas>calorias){
+            lanzarNotificacion("Limite rebasado" , "Ya consumiste más caloría de las que debías , deberías de realizar más actividad física o consumir comida con menos calorías");}
+        TextView ola  = findViewById(R.id.metaDiaria);
+        if(caloriasConsumidas>calorias){
+            ola.setText("Te excediste en " + (caloriasConsumidas-calorias) + " calorías");
+        }else{
+            ola.setText("Te faltan " + (calorias -caloriasConsumidas) + " calorías para alcanzar el objetivo");
+        }
     }
+
 }
