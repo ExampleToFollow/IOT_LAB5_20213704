@@ -79,6 +79,13 @@
             android:text="Agrega comida de una forma rapida"
             android:layout_marginTop="16dp"/>
 
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="configNotificaciones"
+            android:text="Agregar más notificaciones"
+            android:layout_marginTop="16dp"/>
+
 
     </LinearLayout>
 

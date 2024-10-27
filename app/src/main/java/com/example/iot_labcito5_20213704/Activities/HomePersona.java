@@ -62,7 +62,6 @@ public class HomePersona extends AppCompatActivity {
         verificarNotificacion();
         notificarIngresoComida();
     }
-
     public void mostrarComidas(View view) {
         Intent intent =  new Intent(this , ListaComidasActivity.class);
         intent.putExtra("persona", personita);
@@ -87,6 +86,13 @@ public class HomePersona extends AppCompatActivity {
         intent.putExtra("calorias" ,calorias );
         startActivity(intent);
     }
+    public void configNotificaciones(View view){
+        Intent intent =  new Intent(this , ConfigNotificationsActivity.class);
+        intent.putExtra("persona", personita);
+        intent.putExtra("calorias" ,calorias );
+        startActivity(intent);
+    }
+
     //PARA LAS NOTIFICACIONES
     public void crearCanalNotificacion(){
 
@@ -160,9 +166,23 @@ public class HomePersona extends AppCompatActivity {
         }
     }
     public void notificarIngresoComida(){
+        LocalDateTime medianocheManana = LocalDate.now().plusDays(1).atStartOfDay(); // Mañana a las 00:00
+        LocalDateTime medianocheMananaAyer = LocalDate.now().atStartOfDay(); // Mañana a las 00:00
+        int counter = 0;
+        if (personita.getComidas()!=null){
+            for(Comida comida : personita.getComidas()){
+                if(comida.getFecha().isBefore(medianocheManana.atZone(ZoneId.systemDefault()).toInstant())
+                        && comida.getFecha().isAfter(medianocheMananaAyer.atZone(ZoneId.systemDefault()).toInstant())
+                ){
+                    counter++;
+                }
+            }
+        }
+
         Data dataBreakFast = new Data.Builder().putString("food","breakfast").build();
         Data dataLunch = new Data.Builder().putString("food","lunch").build();
         Data dataDinner = new Data.Builder().putString("food","dinner").build();
+        Data dataComioComida = new Data.Builder().putString("food","comioComida").putInt("cantidadComida" ,counter ).build();
         Calendar  breakFast =  Calendar.getInstance();
         breakFast.set(Calendar.HOUR_OF_DAY, 7);
         breakFast.set(Calendar.MINUTE,30);
@@ -175,14 +195,22 @@ public class HomePersona extends AppCompatActivity {
         dinner.set(Calendar.HOUR_OF_DAY, 20);
         dinner.set(Calendar.MINUTE, 30);
         dinner.set(Calendar.SECOND, 0);
+        Calendar comioComida =  Calendar.getInstance();
+        comioComida.set(Calendar.HOUR_OF_DAY, 12);
+        comioComida.set(Calendar.MINUTE, 0);
+        comioComida.set(Calendar.SECOND, 0);
+
         ArrayList<Calendar> fechas = new ArrayList<Calendar>();
         fechas.add(breakFast);
         fechas.add(lunch);
         fechas.add(dinner);
+        fechas.add(comioComida);
         ArrayList<Data> datosComidas = new ArrayList<Data>();
         datosComidas.add(dataBreakFast);
         datosComidas.add(dataLunch);
         datosComidas.add(dataDinner);
+        datosComidas.add(dataComioComida);
+
         for (int i = 0; i < fechas.size(); i++) {
             long time = fechas.get(i).getTimeInMillis();
             if(time<=System.currentTimeMillis()){
@@ -191,5 +219,7 @@ public class HomePersona extends AppCompatActivity {
             PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(WorkerManagerNotification.class,1, TimeUnit.DAYS).setInitialDelay(time- System.currentTimeMillis(), TimeUnit.MILLISECONDS).setInputData(datosComidas.get(i)).build();
             WorkManager.getInstance(this).enqueueUniquePeriodicWork(datosComidas.get(i).getString("food"), ExistingPeriodicWorkPolicy.REPLACE,workRequest);
         }
+
+
     }
 }

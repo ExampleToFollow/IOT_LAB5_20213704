@@ -39,7 +39,15 @@ public class WorkerManagerNotification extends Worker {
     @Override
     public Result doWork(){
         Log.d("Ola", "auxilio");
-        notificacionComidaDiaria(getInputData().getString("food"));
+        if(getInputData().getString("food").equals("comioComida")){
+            notificacionComidaDiariaPorNoComer();
+        }else{
+            notificacionComidaDiaria(getInputData().getString("food"));
+            int ola  = Integer.parseInt(getInputData().getString("cantidadComida"));
+            if(ola==0){
+                notificacionComidaDiariaPorNoComer();
+            }
+        }
         return Result.success();
     }
 
@@ -56,6 +64,22 @@ public class WorkerManagerNotification extends Worker {
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
         if(ActivityCompat.checkSelfPermission(getApplicationContext(),POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
             notificationManagerCompat.notify(2,builder.build());
+        }
+    }
+
+    public void notificacionComidaDiariaPorNoComer(){
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_IMMUTABLE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(),"oli")
+                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setContentTitle("No has registrado comida en todo el día")
+                .setContentText("Registra tus avances!")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
+        if(ActivityCompat.checkSelfPermission(getApplicationContext(),POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
+            notificationManagerCompat.notify(3,builder.build());
         }
     }
 
